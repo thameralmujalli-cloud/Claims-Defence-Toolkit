@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claims Defence Toolkit :: Part 5</title>
+<style>
+  :root{
+    --bg:#EFF2F7; --bgCover:#ECE7E1;
+    --teal:#0D8A8C; --tealDark:#076E70; --red:#C84042; --orange:#E19041;
+    --navy:#2C3F67; --purple:#7B4B94; --slate:#475569;
+    --ink:#1F2A37; --inkSoft:#475569; --inkMute:#94A3B8;
+    --rule:#D6D9DE; --white:#FFFFFF; --beige:#E2D9D0; --mint:#D5DED9;
+    --green:#16A34A; --amber:#F59E0B;
+    --tealTint:#E0F0F0; --orangeTint:#FBE7D6; --navyTint:#D6DCE9;
+    --purpleTint:#E9DEEF; --redTint:#F4D8D9; --slateTint:#DDE2EA;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Calibri','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1020px;margin:0 auto;padding:24px 18px 60px}
+
+  header{background:var(--bgCover);padding:32px 28px;border-radius:8px;margin-bottom:24px;position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;width:240px;height:240px;border-radius:50%;background:var(--beige);right:-80px;top:-90px}
+  header::after{content:'';position:absolute;width:120px;height:120px;border-radius:50%;background:var(--mint);right:60px;top:60px}
+  .series{font-size:11px;font-weight:700;color:var(--teal);letter-spacing:6px;position:relative;z-index:1}
+  .partmark{font-size:13px;font-weight:700;color:var(--orange);letter-spacing:6px;margin-top:18px;position:relative;z-index:1}
+  h1{font-size:32px;font-weight:700;color:var(--ink);margin:6px 0 4px;position:relative;z-index:1;line-height:1.15}
+  .sub{font-size:18px;font-style:italic;color:var(--teal);margin:0 0 6px;position:relative;z-index:1}
+  .tag{font-size:13px;color:var(--inkSoft);position:relative;z-index:1;max-width:680px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:18px;border-bottom:2px solid var(--rule);overflow-x:auto}
+  .tab{padding:12px 18px;font-size:13px;font-weight:700;color:var(--inkMute);background:transparent;border:0;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;letter-spacing:.5px}
+  .tab:hover{color:var(--inkSoft)}
+  .tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+
+  .panel{display:none}
+  .panel.active{display:block}
+
+  .card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:22px 26px;margin-bottom:16px}
+
+  /* Inputs */
+  label{display:block;font-size:11px;font-weight:700;color:var(--inkSoft);letter-spacing:3px;margin-bottom:6px}
+  input[type="text"], input[type="date"], select, textarea {
+    width:100%; padding:10px 12px; border:1px solid var(--rule); border-radius:6px;
+    font-family:inherit; font-size:14px; color:var(--ink); background:var(--white);
+  }
+  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--teal) }
+  .row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .row > div{flex:1;min-width:200px}
+
+  /* Buttons */
+  .actions{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px;flex-wrap:wrap}
+  .btn{font-family:inherit;font-size:13px;font-weight:700;padding:10px 20px;border-radius:6px;border:0;cursor:pointer;letter-spacing:.5px}
+  .btn-primary{background:var(--teal);color:var(--white)}
+  .btn-primary:hover{background:var(--tealDark)}
+  .btn-primary:disabled{background:#9DB7B8;cursor:not-allowed}
+  .btn-ghost{background:transparent;color:var(--inkSoft);border:1px solid var(--rule)}
+  .btn-ghost:hover{color:var(--ink);border-color:var(--inkSoft)}
+
+  /* ========= TAB 1: CLAIM DEFENCE TEST (5-GATE) ========= */
+  .gate{background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;border-left:5px solid var(--rule);overflow:hidden}
+  .gate.g1{border-left-color:var(--teal)}
+  .gate.g2{border-left-color:var(--orange)}
+  .gate.g3{border-left-color:var(--navy)}
+  .gate.g4{border-left-color:var(--purple)}
+  .gate.g5{border-left-color:var(--red)}
+  .gate-head{padding:16px 22px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+  .gate-head h3{margin:0;font-size:15px;color:var(--ink)}
+  .gate-head h3 .gnum{font-size:10px;font-weight:700;letter-spacing:4px;display:block;margin-bottom:4px}
+  .gate.g1 .gnum{color:var(--teal)}
+  .gate.g2 .gnum{color:var(--orange)}
+  .gate.g3 .gnum{color:var(--navy)}
+  .gate.g4 .gnum{color:var(--purple)}
+  .gate.g5 .gnum{color:var(--red)}
+  .gate-head .hlp{font-size:12px;color:var(--inkSoft);font-style:italic;margin:4px 0 0;line-height:1.4}
+  .gate-choice{display:flex;gap:4px;flex-shrink:0;align-self:center}
+  .gch{padding:7px 12px;font-size:11px;font-weight:700;letter-spacing:1px;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:var(--white);color:var(--inkMute);transition:all .15s}
+  .gch:hover{border-color:var(--inkSoft);color:var(--ink)}
+  .gch.pass.sel{background:var(--green);border-color:var(--green);color:var(--white)}
+  .gch.weak.sel{background:var(--amber);border-color:var(--amber);color:var(--white)}
+  .gch.fail.sel{background:var(--red);border-color:var(--red);color:var(--white)}
+
+  .gate-result{display:none;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-top:18px}
+  .gate-result.show{display:block}
+  .gr-head{padding:22px 28px;color:var(--white)}
+  .gr-head.dead{background:var(--red)}
+  .gr-head.weak{background:var(--amber)}
+  .gr-head.alive{background:var(--green)}
+  .gr-head .lbl{font-size:11px;font-weight:700;letter-spacing:6px;opacity:.9}
+  .gr-head h2{margin:6px 0 0;font-size:24px}
+  .gr-head p{margin:6px 0 0;font-size:14px;opacity:.95;font-style:italic}
+  .gr-body{padding:22px 28px}
+  h3.sec{font-size:12px;font-weight:700;color:var(--orange);letter-spacing:5px;margin:0 0 12px}
+  .gatesum{list-style:none;padding:0;margin:0 0 16px}
+  .gatesum li{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:13px;color:var(--ink)}
+  .gatesum li:last-child{border-bottom:0}
+  .gatesum .gname{flex:1;font-weight:700}
+  .gatesum .gstatus{font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 9px;border-radius:3px}
+  .gatesum .gstatus.pass{background:var(--green);color:var(--white)}
+  .gatesum .gstatus.weak{background:var(--amber);color:var(--white)}
+  .gatesum .gstatus.fail{background:var(--red);color:var(--white)}
+
+  /* ========= TAB 2: 28-DAY CLOCK CALCULATOR ========= */
+  .clock-result{display:none;margin-top:18px}
+  .clock-result.show{display:block}
+  .clock-stat{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin-bottom:10px;border-left:5px solid var(--rule);display:flex;justify-content:space-between;align-items:center;gap:14px}
+  .clock-stat.c1{border-left-color:var(--teal)}
+  .clock-stat.c2{border-left-color:var(--orange)}
+  .clock-stat.c3{border-left-color:var(--navy)}
+  .clock-stat.c4{border-left-color:var(--red)}
+  .clock-stat .left{flex:1}
+  .clock-stat .lbl{font-size:10px;font-weight:700;letter-spacing:4px;margin-bottom:4px}
+  .clock-stat.c1 .lbl{color:var(--teal)}
+  .clock-stat.c2 .lbl{color:var(--orange)}
+  .clock-stat.c3 .lbl{color:var(--navy)}
+  .clock-stat.c4 .lbl{color:var(--red)}
+  .clock-stat .nm{font-size:15px;font-weight:700;color:var(--ink)}
+  .clock-stat .dt{font-size:14px;color:var(--inkSoft);font-style:italic;margin-top:2px}
+  .clock-stat .day{font-size:24px;font-weight:700;color:var(--ink);text-align:right;min-width:90px}
+  .clock-stat .day small{display:block;font-size:10px;font-weight:700;color:var(--inkMute);letter-spacing:3px;margin-top:2px}
+  .clock-banner{padding:16px 22px;border-radius:8px;margin-bottom:14px;background:var(--bgCover);border:1px solid var(--rule)}
+  .clock-banner .ttl{font-size:12px;font-weight:700;color:var(--teal);letter-spacing:5px;margin-bottom:6px}
+  .clock-banner p{margin:0;font-size:14px;color:var(--ink)}
+
+  /* ========= TAB 3: SETTLE VS ESCALATE MATRIX ========= */
+  .scale{margin:16px 0 22px}
+  .scale-lbl{display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:var(--inkMute);letter-spacing:3px;margin-bottom:6px}
+  .scale-track{height:36px;background:var(--bgCover);border-radius:18px;position:relative;cursor:pointer}
+  .scale-fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--teal),var(--orange));border-radius:18px;transition:width .25s}
+  .scale-thumb{position:absolute;top:50%;width:32px;height:32px;border-radius:50%;background:var(--white);border:3px solid var(--teal);transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(0,0,0,.15);transition:left .25s}
+  .scale-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:700;color:var(--ink);pointer-events:none}
+
+  .matrix-result{display:none;margin-top:18px;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+  .matrix-result.show{display:block}
+  .mr-head{padding:24px 28px;color:var(--white)}
+  .mr-head.hold{background:var(--orange)}
+  .mr-head.escalate{background:var(--teal)}
+  .mr-head.settle{background:var(--red)}
+  .mr-head.negotiate{background:var(--navy)}
+  .mr-head .lbl{font-size:11px;font-weight:700;letter-spacing:6px;opacity:.9}
+  .mr-head h2{margin:6px 0 0;font-size:26px}
+  .mr-head p{margin:8px 0 0;font-size:14px;opacity:.95;font-style:italic}
+  .mr-body{padding:22px 28px}
+
+  footer{margin-top:30px;padding:20px 0;border-top:1px solid var(--rule);font-size:12px;color:var(--inkSoft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  @media(max-width:680px){
+    h1{font-size:24px}
+    .gate-head{flex-direction:column;align-items:stretch}
+    .clock-stat{flex-direction:column;align-items:flex-start}
+    .clock-stat .day{text-align:left}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="series">THE DEVELOPER'S CONTRACT PLAYBOOK</div>
+    <div class="partmark">PART 05 :: INTERACTIVE TOOLKIT</div>
+    <h1>Claims Defence Toolkit</h1>
+    <p class="sub">Test the gates. Track the clock. Decide the path.</p>
+    <p class="tag">Three tools for the owner's side: a Claim Defence Test that walks every claim through the five substantiation gates, a 28-Day Clock Calculator for any notice date, and a Settle vs Escalate Matrix for the decision that matters most.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="defence" onclick="showPanel('defence')">CLAIM DEFENCE TEST</button>
+    <button class="tab" data-panel="clock" onclick="showPanel('clock')">28-DAY CLOCK</button>
+    <button class="tab" data-panel="matrix" onclick="showPanel('matrix')">SETTLE VS ESCALATE</button>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PANEL 1: CLAIM DEFENCE TEST -->
+  <!-- ============================================ -->
+  <div class="panel active" id="panel-defence">
+    <div class="card">
+      <p style="font-size:13.5px;color:var(--inkSoft);margin:0 0 14px;font-style:italic">Walk a specific claim through the five gates. A claim that fails any gate is dead at that gate. A claim that clears all five is one that has to be settled or arbitrated on its merits.</p>
+      <div class="row">
+        <div>
+          <label>CLAIM REFERENCE (OPTIONAL)</label>
+          <input type="text" id="defClaimRef" placeholder="e.g. Claim 02 - Mechanical scope ambiguity">
+        </div>
+      </div>
+    </div>
+
+    <div class="gate g1" data-gate="1">
+      <div class="gate-head">
+        <div>
+          <h3><span class="gnum">GATE 01</span>NOTICE</h3>
+          <p class="hlp">Was the notice issued within 28 days of the contractor becoming aware of the event giving rise to the claim?</p>
+        </div>
+        <div class="gate-choice">
+          <button class="gch pass" onclick="setGate(1,'pass')">PASS</button>
+          <button class="gch weak" onclick="setGate(1,'weak')">WEAK</button>
+          <button class="gch fail" onclick="setGate(1,'fail')">FAIL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gate g2" data-gate="2">
+      <div class="gate-head">
+        <div>
+          <h3><span class="gnum">GATE 02</span>PARTICULARS</h3>
+          <p class="hlp">Were the supporting particulars (detailed claim, evidence, time and cost impact) submitted within the contractual window (typically 42 to 84 days)?</p>
+        </div>
+        <div class="gate-choice">
+          <button class="gch pass" onclick="setGate(2,'pass')">PASS</button>
+          <button class="gch weak" onclick="setGate(2,'weak')">WEAK</button>
+          <button class="gch fail" onclick="setGate(2,'fail')">FAIL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gate g3" data-gate="3">
+      <div class="gate-head">
+        <div>
+          <h3><span class="gnum">GATE 03</span>CAUSATION</h3>
+          <p class="hlp">Is the link from the event to the alleged time or cost consequence properly evidenced? Does the event actually impact the critical path or cost baseline as claimed?</p>
+        </div>
+        <div class="gate-choice">
+          <button class="gch pass" onclick="setGate(3,'pass')">PASS</button>
+          <button class="gch weak" onclick="setGate(3,'weak')">WEAK</button>
+          <button class="gch fail" onclick="setGate(3,'fail')">FAIL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gate g4" data-gate="4">
+      <div class="gate-head">
+        <div>
+          <h3><span class="gnum">GATE 04</span>QUANTUM</h3>
+          <p class="hlp">Is the time or cost claimed properly calculated, with itemised, invoice-level evidence? Or is it a headline figure without substantiation?</p>
+        </div>
+        <div class="gate-choice">
+          <button class="gch pass" onclick="setGate(4,'pass')">PASS</button>
+          <button class="gch weak" onclick="setGate(4,'weak')">WEAK</button>
+          <button class="gch fail" onclick="setGate(4,'fail')">FAIL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gate g5" data-gate="5">
+      <div class="gate-head">
+        <div>
+          <h3><span class="gnum">GATE 05</span>MITIGATION</h3>
+          <p class="hlp">Did the contractor take reasonable steps to mitigate the time or cost impact, and is that mitigation documented?</p>
+        </div>
+        <div class="gate-choice">
+          <button class="gch pass" onclick="setGate(5,'pass')">PASS</button>
+          <button class="gch weak" onclick="setGate(5,'weak')">WEAK</button>
+          <button class="gch fail" onclick="setGate(5,'fail')">FAIL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="resetGates()">Reset</button>
+      <button class="btn btn-primary" id="defBtn" onclick="showGateResult()" disabled>See the verdict</button>
+    </div>
+
+    <div class="gate-result" id="defResult">
+      <div class="gr-head" id="defResHead">
+        <div class="lbl">CLAIM DEFENCE VERDICT</div>
+        <h2 id="defResTitle">...</h2>
+        <p id="defResLine">...</p>
+      </div>
+      <div class="gr-body">
+        <h3 class="sec">GATE-BY-GATE SUMMARY</h3>
+        <ul class="gatesum" id="defGateSum"></ul>
+        <h3 class="sec">RECOMMENDED OWNER-SIDE RESPONSE</h3>
+        <p id="defRecommendation" style="font-size:13.5px;color:var(--ink);line-height:1.5;margin:0"></p>
+        <div class="actions" style="margin-top:18px">
+          <button class="btn btn-ghost" onclick="resetGates()">Test another claim</button>
+          <button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PANEL 2: 28-DAY CLOCK -->
+  <!-- ============================================ -->
+  <div class="panel" id="panel-clock">
+    <div class="card">
+      <p style="font-size:13.5px;color:var(--inkSoft);margin:0 0 14px;font-style:italic">Enter the date the contractor became aware of the event. The calculator returns the full substantiation deadline schedule under FIDIC 2017 conventions (Sub-Clause 20.2).</p>
+      <div class="row">
+        <div>
+          <label>DATE OF AWARENESS (EVENT DATE)</label>
+          <input type="date" id="clockDate">
+        </div>
+        <div>
+          <label>EVENT REFERENCE (OPTIONAL)</label>
+          <input type="text" id="clockRef" placeholder="e.g. Late approval - mechanical floor 3">
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="resetClock()">Reset</button>
+        <button class="btn btn-primary" id="clockBtn" onclick="showClockResult()">Calculate the schedule</button>
+      </div>
+    </div>
+
+    <div class="clock-result" id="clockResult">
+      <div class="clock-banner">
+        <div class="ttl">DEADLINE SCHEDULE</div>
+        <p id="clockHeader">...</p>
+      </div>
+      <div class="clock-stat c1">
+        <div class="left">
+          <div class="lbl">DAY 0</div>
+          <div class="nm">Event occurs / Contractor becomes aware</div>
+          <div class="dt" id="clockDay0">...</div>
+        </div>
+        <div class="day" id="clockDay0Until"><small>STARTS</small></div>
+      </div>
+      <div class="clock-stat c2">
+        <div class="left">
+          <div class="lbl">DAY 28</div>
+          <div class="nm">Notice deadline (Sub-Clause 20.2)</div>
+          <div class="dt" id="clockDay28">...</div>
+        </div>
+        <div class="day" id="clockDay28Until"><small>DAYS</small></div>
+      </div>
+      <div class="clock-stat c3">
+        <div class="left">
+          <div class="lbl">DAY 84</div>
+          <div class="nm">Detailed particulars due</div>
+          <div class="dt" id="clockDay84">...</div>
+        </div>
+        <div class="day" id="clockDay84Until"><small>DAYS</small></div>
+      </div>
+      <div class="clock-stat c4">
+        <div class="left">
+          <div class="lbl">DAY 126</div>
+          <div class="nm">Engineer's determination expected</div>
+          <div class="dt" id="clockDay126">...</div>
+        </div>
+        <div class="day" id="clockDay126Until"><small>DAYS</small></div>
+      </div>
+      <div class="actions" style="margin-top:18px">
+        <button class="btn btn-ghost" onclick="resetClock()">New event</button>
+        <button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PANEL 3: SETTLE VS ESCALATE -->
+  <!-- ============================================ -->
+  <div class="panel" id="panel-matrix">
+    <div class="card">
+      <p style="font-size:13.5px;color:var(--inkSoft);margin:0 0 14px;font-style:italic">The decision matrix runs on two axes: how strong is the owner's merit position on this claim, and how much precedent value does this claim carry across the portfolio? Move the sliders to see the recommendation.</p>
+
+      <div class="scale">
+        <div class="scale-lbl"><span>OWNER'S MERIT POSITION</span><span id="meritLabel">50</span></div>
+        <div class="scale-track" id="meritTrack" onclick="setSlider('merit', event)">
+          <div class="scale-fill" id="meritFill" style="width:50%"></div>
+          <div class="scale-thumb" id="meritThumb" style="left:50%"></div>
+        </div>
+      </div>
+
+      <div class="scale">
+        <div class="scale-lbl"><span>PRECEDENT VALUE</span><span id="precedentLabel">50</span></div>
+        <div class="scale-track" id="precedentTrack" onclick="setSlider('precedent', event)">
+          <div class="scale-fill" id="precedentFill" style="width:50%"></div>
+          <div class="scale-thumb" id="precedentThumb" style="left:50%"></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>RELATIONSHIP COST OF DEFENCE</label>
+          <select id="relCost">
+            <option value="low">Low. Claim is from a one-off contractor</option>
+            <option value="medium" selected>Medium. Claim from a current portfolio contractor</option>
+            <option value="high">High. Contractor is delivering critical work in parallel</option>
+          </select>
+        </div>
+        <div>
+          <label>ESTIMATED DEFENCE COST</label>
+          <select id="defCost">
+            <option value="low">Below 5% of claim value</option>
+            <option value="medium" selected>5% to 15% of claim value</option>
+            <option value="high">Above 15% of claim value</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="matrix-result show" id="matrixResult">
+      <div class="mr-head" id="matrixResHead">
+        <div class="lbl">RECOMMENDED POSITION</div>
+        <h2 id="matrixResTitle">...</h2>
+        <p id="matrixResLine">...</p>
+      </div>
+      <div class="mr-body">
+        <h3 class="sec">WHY THIS QUADRANT</h3>
+        <p id="matrixWhy" style="font-size:13.5px;color:var(--ink);line-height:1.5;margin:0 0 14px"></p>
+        <h3 class="sec">NEXT STEPS</h3>
+        <ul id="matrixSteps" style="margin:0;padding-left:20px;font-size:13.5px;color:var(--ink);line-height:1.6"></ul>
+        <div class="actions" style="margin-top:18px">
+          <button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span><b>Thamer AlMujalli</b> · PMO-CP · PMI-CP · PMP · P6</span>
+    <span>The Developer's Contract Playbook · Part 5 of 5</span>
+  </footer>
+
+</div>
+
+<script>
+// ============================================================================
+// TAB SWITCHING
+// ============================================================================
+function showPanel(name){
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ============================================================================
+// PANEL 1: CLAIM DEFENCE TEST
+// ============================================================================
+const GATE_NAMES = {
+  1: { name: "Notice", color: "teal" },
+  2: { name: "Particulars", color: "orange" },
+  3: { name: "Causation", color: "navy" },
+  4: { name: "Quantum", color: "purple" },
+  5: { name: "Mitigation", color: "red" }
+};
+
+let gateAnswers = {};
+
+function setGate(g, v){
+  gateAnswers[g] = v;
+  const el = document.querySelector(`.gate[data-gate="${g}"]`);
+  el.querySelectorAll('.gch').forEach(b => b.classList.remove('sel'));
+  el.querySelector(`.gch.${v}`).classList.add('sel');
+  document.getElementById('defBtn').disabled = Object.keys(gateAnswers).length < 5;
+}
+
+function resetGates(){
+  gateAnswers = {};
+  document.querySelectorAll('.gate .gch').forEach(b => b.classList.remove('sel'));
+  document.getElementById('defResult').classList.remove('show');
+  document.getElementById('defBtn').disabled = true;
+  document.getElementById('defClaimRef').value = '';
+}
+
+function showGateResult(){
+  const v1 = gateAnswers[1], v2 = gateAnswers[2], v3 = gateAnswers[3];
+  const v4 = gateAnswers[4], v5 = gateAnswers[5];
+  let verdict, color, line, rec;
+
+  // Procedural gates (1, 2) are fatal if failed
+  if (v1 === 'fail') {
+    verdict = "DEAD AT GATE 01";
+    color = "dead";
+    line = "Late notice. The claim is procedurally barred under the 28-day time-bar.";
+    rec = "Issue a formal rejection citing the time-bar. Do not engage on the merits, because doing so may waive the procedural defence. Document the rejection for the project record and as portfolio precedent.";
+  } else if (v2 === 'fail') {
+    verdict = "DEAD AT GATE 02";
+    color = "dead";
+    line = "Particulars not submitted within the contractual window. The claim is incomplete.";
+    rec = "Issue a formal request for particulars with a stated deadline. If the deadline passes, reject the claim as procedurally incomplete. Until the particulars arrive, the claim cannot progress to substantiation review.";
+  } else if (v3 === 'fail') {
+    verdict = "FAILS ON CAUSATION";
+    color = "dead";
+    line = "Notice and particulars are in order, but the contractor has not established the link from event to consequence.";
+    rec = "Demand critical-path analysis (for time) or itemised cost-event nexus (for cost). Reject the claim until causation is proven. The procedural defences are intact, so engagement is on the contractor's terms.";
+  } else if (v4 === 'fail') {
+    verdict = "FAILS ON QUANTUM";
+    color = "dead";
+    line = "Causation may be established, but the time or cost figure is unsupported by evidence.";
+    rec = "Require invoice-level substantiation. Reject lump-sum claims. The Engineer's determination should be limited to the evidenced portion of the claim only.";
+  } else if (v5 === 'fail') {
+    verdict = "FAILS ON MITIGATION";
+    color = "dead";
+    line = "The contractor has not demonstrated reasonable mitigation, so the loss is not fully recoverable.";
+    rec = "Reduce the claim to the loss the contractor could not have reasonably mitigated. The Engineer's determination should net out the unmitigated portion.";
+  } else if ([v1,v2,v3,v4,v5].every(v => v === 'pass')) {
+    verdict = "ALIVE ON ALL FIVE GATES";
+    color = "alive";
+    line = "The claim has cleared every procedural and substantive gate. This is a claim that has to be resolved.";
+    rec = "Move to the Settle vs Escalate matrix. Test the merit and precedent value to decide the path. A claim that clears all five gates is rarely worth fighting on principle alone.";
+  } else {
+    verdict = "WEAK ON ONE OR MORE GATES";
+    color = "weak";
+    line = "No outright failures, but the claim has weaknesses that affect its valuation.";
+    rec = "Engage on the weak gates first. Each WEAK rating is a discount on the claim's recoverable value. Do not pay the headline figure. Negotiate downward to the substantiated portion only.";
+  }
+
+  const head = document.getElementById('defResHead');
+  head.className = 'gr-head ' + color;
+  document.getElementById('defResTitle').textContent = verdict;
+  document.getElementById('defResLine').textContent = line;
+  document.getElementById('defRecommendation').textContent = rec;
+
+  // Gate summary
+  document.getElementById('defGateSum').innerHTML = [1,2,3,4,5].map(g => {
+    const v = gateAnswers[g];
+    const status = v === 'pass' ? 'PASS' : v === 'weak' ? 'WEAK' : 'FAIL';
+    return `<li><span class="gname">Gate 0${g}, ${GATE_NAMES[g].name}</span><span class="gstatus ${v}">${status}</span></li>`;
+  }).join('');
+
+  document.getElementById('defResult').classList.add('show');
+  document.getElementById('defResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ============================================================================
+// PANEL 2: 28-DAY CLOCK CALCULATOR
+// ============================================================================
+function fmtDate(d){
+  return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function addDays(d, n){
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+function daysFromToday(d){
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const target = new Date(d);
+  target.setHours(0,0,0,0);
+  const diff = Math.round((target - today) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+
+function resetClock(){
+  document.getElementById('clockDate').value = '';
+  document.getElementById('clockRef').value = '';
+  document.getElementById('clockResult').classList.remove('show');
+}
+
+function showClockResult(){
+  const dateStr = document.getElementById('clockDate').value;
+  if (!dateStr) { alert('Please enter the date of awareness.'); return; }
+  const day0 = new Date(dateStr);
+  const day28 = addDays(day0, 28);
+  const day84 = addDays(day0, 84);
+  const day126 = addDays(day0, 126);
+  const ref = document.getElementById('clockRef').value;
+
+  document.getElementById('clockHeader').textContent = ref
+    ? `Schedule for: ${ref}`
+    : `Schedule based on event date ${fmtDate(day0)}.`;
+
+  document.getElementById('clockDay0').textContent = fmtDate(day0);
+  document.getElementById('clockDay28').textContent = fmtDate(day28);
+  document.getElementById('clockDay84').textContent = fmtDate(day84);
+  document.getElementById('clockDay126').textContent = fmtDate(day126);
+
+  function setDayUntil(elemId, target){
+    const diff = daysFromToday(target);
+    const el = document.getElementById(elemId);
+    let html;
+    if (diff > 0) html = `${diff}<small>DAYS TO GO</small>`;
+    else if (diff === 0) html = `TODAY<small>DEADLINE</small>`;
+    else html = `${Math.abs(diff)}<small>DAYS PAST</small>`;
+    el.innerHTML = html;
+  }
+
+  document.getElementById('clockDay0Until').innerHTML = `<small>EVENT</small>`;
+  setDayUntil('clockDay28Until', day28);
+  setDayUntil('clockDay84Until', day84);
+  setDayUntil('clockDay126Until', day126);
+
+  document.getElementById('clockResult').classList.add('show');
+  document.getElementById('clockResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ============================================================================
+// PANEL 3: SETTLE VS ESCALATE MATRIX
+// ============================================================================
+let meritVal = 50;
+let precedentVal = 50;
+
+function setSlider(which, evt){
+  const trackId = which + 'Track';
+  const track = document.getElementById(trackId);
+  const rect = track.getBoundingClientRect();
+  let pct = ((evt.clientX - rect.left) / rect.width) * 100;
+  pct = Math.max(0, Math.min(100, pct));
+  pct = Math.round(pct);
+
+  if (which === 'merit') meritVal = pct;
+  else precedentVal = pct;
+
+  document.getElementById(which + 'Fill').style.width = pct + '%';
+  document.getElementById(which + 'Thumb').style.left = pct + '%';
+  document.getElementById(which + 'Label').textContent = pct;
+
+  updateMatrix();
+}
+
+function updateMatrix(){
+  const merit = meritVal;
+  const precedent = precedentVal;
+  const relCost = document.getElementById('relCost').value;
+  const defCost = document.getElementById('defCost').value;
+
+  let quadrant, color, line, why, steps;
+
+  const highMerit = merit >= 50;
+  const highPrec = precedent >= 50;
+
+  if (!highMerit && highPrec) {
+    quadrant = "HOLD THE LINE";
+    color = "hold";
+    line = "Low merit, high precedent. The position is defensible on procedure, not substance, but the precedent matters.";
+    why = "Conceding a claim with high precedent value invites the same claim from every other contractor in the portfolio. Defending on procedure is cheaper than defending on merit, and it sends the right signal across the portfolio.";
+    steps = [
+      "Issue a formal rejection grounded in procedural defence (gate 01 or 02).",
+      "Document the basis of rejection for portfolio reference.",
+      "Avoid commercial engagement on the merits, which can waive the procedural defence.",
+      "Brief the wider PMO so the same defence is applied consistently across projects."
+    ];
+  } else if (highMerit && highPrec) {
+    quadrant = "ESCALATE";
+    color = "escalate";
+    line = "High merit, high precedent. The owner's position is strong, and the outcome shapes future claims.";
+    why = "An escalation here produces a precedent that benefits the entire portfolio. The cost of arbitration is justified by the saving across future claims, even if the immediate claim is modest.";
+    steps = [
+      "Decline settlement offers below the owner's reasonable position.",
+      "Refer the dispute to DAB or DAAB if available, otherwise prepare for SCCA arbitration.",
+      "Build the substantiation file with full documentation, anticipating arbitration.",
+      "Communicate the position internally so the wider PMO benefits from the precedent."
+    ];
+  } else if (!highMerit && !highPrec) {
+    quadrant = "SETTLE EARLY";
+    color = "settle";
+    line = "Low merit, low precedent. The cost of defence exceeds the value of the position.";
+    why = "Continuing to argue this claim consumes management attention and external counsel time, with no portfolio benefit. Settling early at a discount frees the team to focus on claims that matter.";
+    steps = [
+      "Open a settlement conversation with the contractor.",
+      "Anchor the settlement at the substantiated portion of the claim, not the headline figure.",
+      "Document the basis of settlement to prevent it being cited as precedent.",
+      "Close the file and reallocate management attention."
+    ];
+  } else {
+    quadrant = "NEGOTIATE FROM STRENGTH";
+    color = "negotiate";
+    line = "High merit, low precedent. The owner's position is strong, but the outcome does not need to set a precedent.";
+    why = "Commercial resolution is preferable to escalation when precedent value is low. The owner negotiates from a position of strength, settling without giving up the substantive position.";
+    steps = [
+      "Communicate the strength of the owner's position to the contractor early.",
+      "Offer commercial settlement at a discount that reflects the merit position.",
+      "Avoid arbitration unless the contractor refuses a reasonable settlement.",
+      "If the relationship matters, frame the settlement as preserving the working relationship."
+    ];
+  }
+
+  const head = document.getElementById('matrixResHead');
+  head.className = 'mr-head ' + color;
+  document.getElementById('matrixResTitle').textContent = quadrant;
+  document.getElementById('matrixResLine').textContent = line;
+  document.getElementById('matrixWhy').textContent = why;
+  document.getElementById('matrixSteps').innerHTML = steps.map(s => `<li>${s}</li>`).join('');
+}
+
+document.getElementById('relCost').addEventListener('change', updateMatrix);
+document.getElementById('defCost').addEventListener('change', updateMatrix);
+
+// ============================================================================
+// INIT
+// ============================================================================
+updateMatrix();
+</script>
+</body>
+</html>
